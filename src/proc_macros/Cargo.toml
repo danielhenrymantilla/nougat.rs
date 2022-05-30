@@ -8,7 +8,7 @@ name = "nougat-proc_macros"
 authors = [
     "Daniel Henry-Mantilla <daniel.henry.mantilla@gmail.com>"
 ]
-version = "0.1.0-rc1"  # Keep in sync
+version = "0.1.0"  # Keep in sync
 edition = "2018"
 
 license = "Zlib OR MIT OR Apache-2.0"
@@ -22,8 +22,8 @@ proc-macro2.version = "1.0.0"
 quote.version = "1.0.0"
 syn.version = "1.0.7"  # Access to `receiver()`.
 syn.features = [
-    "fold",
     "full",
+    "visit-mut",
 ]
 
 prettyplease.optional = true

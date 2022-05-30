@@ -244,12 +244,13 @@ https://i.imgur.com/0yyQVJf.gif)
 
 #### The actual explanation
 
-I would have gladly spent hours detailing it, but luckily for me, somebody has
-already done that work, with nicer prose than mine: `Sabrina Jewson`. She has
-written a very complete and thorough blog post about GATs, their stable
-polyfills, and how they compare (funnily enough, [GATs are currently _worse_
-than their polyfills since due to a compiler bug whenever one adds a trait
-bound to a GAT, then the GAT in question ends up having to be `: 'static`](
+As I was bracing myself to spend hours detailing these tricks 😅, luckily for
+me, I learned that somebody had already done all that work, with definitely
+nicer prose than mine: `Sabrina Jewson` 🙏. She has written a very complete and
+thorough blog post about GATs, their stable polyfills, and how they compare with
+each other (funnily enough, [GATs are currently _worse_ than their polyfills
+since due to a compiler bug whenever one adds a trait bound to a GAT, then the
+GAT in question ends up having to be `: 'static`](
 https://rust-lang.zulipchat.com/#narrow/stream/122651-general/topic/.E2.9C.94.20GAT.20LendingIterator.3A.3Achain.20Issue/near/278176903),
 for no actual reason other than the compiler brain-farting on it).
 
@@ -257,7 +258,7 @@ Here is the link to said blog post, pointing directly at the workaround that
 this crate happens to be using, but feel free to remove the anchor and read the
 full post, it's definitely worth it:
 
-> # <a href="https://sabrinajewson.org/blog/the-better-alternative-to-lifetime-gats#hrtb-supertrait">_The Better Alternative to Lifetime GATs_ – by Sabrina Jewson</a>
+> # <a href="https://sabrinajewson.org/blog/the-better-alternative-to-lifetime-gats#hrtb-supertrait">📕 _The Better Alternative to Lifetime GATs_ – by Sabrina Jewson 📕</a>
 
 ___
 
@@ -274,6 +275,10 @@ ___
 
   - In order to refer to GATs outside of
     <code>[#\[gat\]]</code>-annotated items using [`Gat!`] is needed.
+
+  - Adding trait bounds to GATs in functions breaks type inference for that
+    function (thanks to Discord use `Globi` for identifying and reporting this)
+
 
 [`Gat!`]: https://docs.rs/nougat/0.1.*/nougat/macro.Gat.html
 [#\[gat\]]: https://docs.rs/nougat/0.1.*/nougat/att.gat.html

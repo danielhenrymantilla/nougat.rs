@@ -127,16 +127,16 @@ struct ReplaceSelfAssocLtWithSelfAsTraitAssocLt /* = */ (
     Path,
 );
 
-impl fold::Fold
+impl visit_mut::VisitMut
     for ReplaceSelfAssocLtWithSelfAsTraitAssocLt
 {
-    fn fold_type_path (
+    fn visit_type_path_mut (
         self: &'_ mut Self,
-        mut type_path: TypePath,
-    ) -> TypePath
+        type_path: &'_ mut TypePath,
+    )
     {
         // 1. subrecurse
-        type_path = fold::fold_type_path(self, type_path);
+        visit_mut::visit_type_path_mut(self, type_path);
 
         // 2. Handle the `Self::` case.
         if  type_path.path.segments.first().unwrap().ident == "Self"
@@ -169,7 +169,5 @@ impl fold::Fold
                 gt_token: <_>::default(),
             });
         }
-
-        type_path
     }
 }

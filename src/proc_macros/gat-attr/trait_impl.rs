@@ -16,22 +16,18 @@ fn handle (
     };
 
     // Conr-"adjugate" first, to tweak the impl bounds and so on.
-    impl_ =
-        match
-            adjugate::adjugate(
-                parse::Nothing,
-                Item::Impl(fold::Fold::fold_item_impl(
-                    &mut ReplaceSelfAssocLtWithSelfAsTraitAssocLt(
-                        PathToTrait.clone(),
-                    ),
-                    impl_,
-                )),
-            )
-        {
+    impl_ = {
+        visit_mut::VisitMut::visit_item_impl_mut(
+            &mut ReplaceSelfAssocLtWithSelfAsTraitAssocLt(
+                PathToTrait.clone(),
+            ),
+            &mut impl_,
+        );
+        match adjugate::adjugate(parse::Nothing, Item::Impl(impl_)) {
             | Item::Impl(it) => it,
             | _ => unreachable!(),
         }
-    ;
+    };
 
     // Extract the (lifetime) gats.
     #[allow(unstable_name_collisions)]

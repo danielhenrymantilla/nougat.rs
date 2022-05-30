@@ -6,26 +6,22 @@ fn handle (
 ) -> Result<TokenStream2>
 {
     // Conr-"adjugate" first, to tweak the impl bounds and so on.
-    trait_ =
-        match
-            adjugate::adjugate(
-                parse::Nothing,
-                Item::Trait(fold::Fold::fold_item_trait(
-                    &mut ReplaceSelfAssocLtWithSelfAsTraitAssocLt({
-                        let TraitName = &trait_.ident;
-                        let fwd_generics = trait_.generics.split_for_impl().1;
-                        parse_quote!(
-                            #TraitName #fwd_generics
-                        )
-                    }),
-                    trait_,
-                )),
-            )
-        {
+    trait_ = {
+        visit_mut::VisitMut::visit_item_trait_mut(
+            &mut ReplaceSelfAssocLtWithSelfAsTraitAssocLt({
+                let TraitName = &trait_.ident;
+                let fwd_generics = trait_.generics.split_for_impl().1;
+                parse_quote!(
+                    #TraitName #fwd_generics
+                )
+            }),
+            &mut trait_,
+        );
+        match adjugate::adjugate(parse::Nothing, Item::Trait(trait_)) {
             | Item::Trait(it) => it,
             | _ => unreachable!(),
         }
-    ;
+    };
 
     // Extract the (lifetime) gats.
     #[allow(unstable_name_collisions)]
