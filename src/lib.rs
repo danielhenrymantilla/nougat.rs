@@ -218,6 +218,6 @@ pub use ::nougat_proc_macros::Gat;
 pub use ::macro_rules_attribute::apply;
 
 #[cfg_attr(feature = "ui-tests",
-    cfg_attr(all(), doc = include_str!("compile_fail_tests.md")),
+    doc = include_str!("compile_fail_tests.md"),
 )]
 mod _compile_fail_tests {}
