@@ -7,30 +7,34 @@ use super::*;
 pub(in super)
 fn adjugate (
     _attrs: parse::Nothing,
-    input: Item,
+    mut input: Item,
 ) -> Item
 {
-    fold::Fold::fold_item(
+    visit_mut::VisitMut::visit_item_mut(
         &mut ApplyGatToEachTypePathOccurrence,
-        input,
-    )
+        &mut input,
+    );
+    input
 }
 
 struct ApplyGatToEachTypePathOccurrence;
 
-impl fold::Fold for ApplyGatToEachTypePathOccurrence {
-    fn fold_type (
+impl visit_mut::VisitMut for ApplyGatToEachTypePathOccurrence {
+    fn visit_type_mut (
         self: &'_ mut ApplyGatToEachTypePathOccurrence,
-        type_: Type,
-    ) -> Type
+        type_: &'_ mut Type,
+    )
     {
-        let type_ = fold::fold_type(self, type_); // subrecurse
-        match type_ {
-            | Type::Path(ref type_path) => {
-                Gat::Gat::<()>(Gat::Input::TypePath(type_path.clone()))
-                    .map_or(type_, Type::Verbatim) // <- no unnecessary parsing
-            },
-            | _ => type_,
+        visit_mut::visit_type_mut(self, type_); // subrecurse
+        if let Type::Path(ref type_path) = *type_ {
+            match Gat::Gat(Gat::Input::TypePath(type_path.clone())) {
+                | Ok(modified_type_path) => {
+                    // Trick: using `Verbatim` over `parse2` skips a layer
+                    // of unnecessary parsing.
+                    *type_ = Type::Verbatim(modified_type_path);
+                },
+                | Err(()) => {},
+            }
         }
     }
 }

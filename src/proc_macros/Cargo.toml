@@ -22,8 +22,8 @@ proc-macro2.version = "1.0.0"
 quote.version = "1.0.0"
 syn.version = "1.0.7"  # Access to `receiver()`.
 syn.features = [
-    "fold",
     "full",
+    "visit-mut",
 ]
 
 prettyplease.optional = true
