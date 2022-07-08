@@ -23,6 +23,7 @@ https://github.com/danielhenrymantilla/nougat.rs/actions)
 
 ```rust
 #![forbid(unsafe_code)]
+# use ::core::convert::TryInto;
 
 #[macro_use]
 extern crate nougat;
