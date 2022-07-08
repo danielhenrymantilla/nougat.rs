@@ -37,21 +37,6 @@ mod Gat;
 use self::utils::*;
 mod utils;
 
-// // Documentation located in the frontend crate.
-// #[proc_macro_attribute] pub
-// fn adjugate (
-//     attrs: TokenStream,
-//     input: TokenStream,
-// ) -> TokenStream
-// {
-//     adjugate::adjugate(
-//         parse_macro_input!(attrs),
-//         parse_macro_input!(input),
-//     )
-//     .into_token_stream()
-//     .into()
-// }
-
 // Documentation located in the frontend crate.
 #[proc_macro_attribute] pub
 fn gat (

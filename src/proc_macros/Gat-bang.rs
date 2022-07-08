@@ -32,10 +32,10 @@ fn Gat<Error : SynError> (
 
         match input {
             | Input::TypePath(it) => it,
-            | Input::Item(item) => return Ok(
+            | Input::Item(item) => return Ok(utils::mb_file_expanded(
                 adjugate::adjugate(parse::Nothing, item)
                     .into_token_stream()
-            ),
+            )),
         }
     };
     let qself = match qself {

@@ -15,6 +15,7 @@ fn gat (
         | Item::Impl(item_impl) => trait_impl::handle(item_impl),
         | _ => bail!("expected a `trait` or an `impl… Trait for`"),
     }
+    .map(utils::mb_file_expanded)
 }
 
 //. A lifetime-generic associated type.
