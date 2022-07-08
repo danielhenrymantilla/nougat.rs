@@ -85,10 +85,10 @@ fn handle (
             &generics.params,
             &generics.where_clause,
         );
-        let LGat { attrs, .. } = &lgat;
+        // let LGat { attrs, .. } = &lgat;
         let pub_ = &trait_.vis;
         ret.extend(quote!(
-            #(#attrs)*
+            // #(#attrs)*
             #[allow(warnings, clippy::all)]
             #pub_
             trait #TraitName <#intro_generics>

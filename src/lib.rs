@@ -1,6 +1,8 @@
 //! [`Gat!`]: Gat
 //! [#\[gat\]]: gat
-#![doc = include_str!("../README.md")]
+#![cfg_attr(feature = "docs",
+    cfg_attr(all(), doc = include_str!("../README.md")),
+)]
 #![doc(html_logo_url = "https://user-images.githubusercontent.com/9920355/170709986-aaa13f92-0faf-4b5d-89c9-6463b6b3d49b.png")]
 #![deny(rustdoc::private_intra_doc_links)]
 
@@ -13,6 +15,7 @@
 /// ## Example(s)
 ///
 /** -  ```rust
+    # use ::core::convert::TryInto;
     # fn main() {}
     #[macro_use]
     extern crate nougat;
@@ -218,6 +221,6 @@ pub use ::nougat_proc_macros::Gat;
 pub use ::macro_rules_attribute::apply;
 
 #[cfg_attr(feature = "ui-tests",
-    doc = include_str!("compile_fail_tests.md"),
+    cfg_attr(all(), doc = include_str!("compile_fail_tests.md")),
 )]
 mod _compile_fail_tests {}

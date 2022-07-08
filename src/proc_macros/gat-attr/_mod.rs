@@ -15,6 +15,7 @@ fn gat (
         | Item::Impl(item_impl) => trait_impl::handle(item_impl),
         | _ => bail!("expected a `trait` or an `impl… Trait for`"),
     }
+    .map(utils::mb_file_expanded)
 }
 
 //. A lifetime-generic associated type.
@@ -142,7 +143,7 @@ impl visit_mut::VisitMut
         if  type_path.path.segments.first().unwrap().ident == "Self"
         &&  matches!(
                 type_path.path.segments.last().unwrap().arguments,
-                | PathArguments::AngleBracketed { .. }
+                PathArguments::AngleBracketed { .. }
             )
         {
             let Self_;

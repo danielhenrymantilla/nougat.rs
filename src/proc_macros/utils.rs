@@ -9,7 +9,6 @@ fn unwrap (
 ) -> TokenStream
 {
     result
-        .map(utils::mb_file_expanded)
         .unwrap_or_else(|err| {
             let mut errors =
                 err .into_iter()

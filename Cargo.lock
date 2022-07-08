@@ -4,9 +4,9 @@ version = 3
 
 [[package]]
 name = "macro_rules_attribute"
-version = "0.1.0"
+version = "0.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2db753a9eacb63f7aa2c64bfdd2cd3f35cc8b0946799f0b60f7110f4f3104e3b"
+checksum = "258c86475e1616d6f2d8f5227cfaabd3dae1f6d5388b9597df8a199d4497aba7"
 dependencies = [
  "macro_rules_attribute-proc_macro",
  "paste",
@@ -14,13 +14,13 @@ dependencies = [
 
 [[package]]
 name = "macro_rules_attribute-proc_macro"
-version = "0.1.0"
+version = "0.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "61568f4b6f1d9c6b31185090275fb372dab0f5cea6a772e906ec56d1dc6d74aa"
+checksum = "f26a8d2502d5aa4d411ef494ba7470eb299f05725179ce3b5de77aa01a9ffdea"
 
 [[package]]
 name = "nougat"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "macro_rules_attribute",
  "nougat-proc_macros",
@@ -29,7 +29,7 @@ dependencies = [
 
 [[package]]
 name = "nougat-proc_macros"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "prettyplease",
  "proc-macro2",
