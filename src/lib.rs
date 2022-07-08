@@ -1,6 +1,6 @@
 //! [`Gat!`]: Gat
 //! [#\[gat\]]: gat
-#![cfg_attr(docs,
+#![cfg_attr(feature = "docs",
     cfg_attr(all(), doc = include_str!("../README.md")),
 )]
 #![doc(html_logo_url = "https://user-images.githubusercontent.com/9920355/170709986-aaa13f92-0faf-4b5d-89c9-6463b6b3d49b.png")]

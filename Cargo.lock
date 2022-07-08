@@ -20,7 +20,7 @@ checksum = "f26a8d2502d5aa4d411ef494ba7470eb299f05725179ce3b5de77aa01a9ffdea"
 
 [[package]]
 name = "nougat"
-version = "0.2.0"
+version = "0.2.0-rc2"
 dependencies = [
  "macro_rules_attribute",
  "nougat-proc_macros",
@@ -29,7 +29,7 @@ dependencies = [
 
 [[package]]
 name = "nougat-proc_macros"
-version = "0.2.0"
+version = "0.2.0-rc2"
 dependencies = [
  "prettyplease",
  "proc-macro2",
