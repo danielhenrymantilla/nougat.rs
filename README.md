@@ -142,16 +142,17 @@ https://i.imgur.com/0yyQVJf.gif)
 
       - I was unable to express the `where Self : 'next` GAT-bounds.
 
- 1. **2021/03/08**: [I officially mention the workaround for
+ 1. **2022/03/08**: [I officially mention the workaround for
     "_late_/`for`-quantifying `where T : 'lt`" clauses thanks implicit bounds
     on types such as `&'lt T`](https://users.rust-lang.org/t/how-to-end-borrow-in-this-code/72719/2?u=yandros).
 
 <details><summary>Click to see even more context</summary>
 
-  - I don't think I fully came out with this idea by myself; it's a bit fuzzy
-    but I vaguely recall URLO user `steffahn` working with similar shenanigans
-    and I clearly remember somebody over the Rust discord (was it `Kestrer`?)
-    pointing out the implicit bound hack.
+  - I didn't come out with this idea by myself; it's a bit fuzzy
+    but I recall URLO user `steffahn` working _a lot_ with similar shenanigans
+    (_e.g._, this **2021/04/26** [issue](https://github.com/rust-lang/rust/issues/84591)),
+    and I clearly remember `Kestrer` over the community Discord [pointing out
+    the implicit bound hack](https://discord.com/channels/273534239310479360/592856094527848449/842887682044461056).
 
       - For those interested, I used this technique, later on, to work around
         a nasty "overly restrictive lifetime-bound in higher-order closure
