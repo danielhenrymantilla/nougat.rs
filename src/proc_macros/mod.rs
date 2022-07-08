@@ -68,7 +68,7 @@ fn combine_trait_name_and_assoc_type (
 ) -> Ident
 {
     Ident::new(
-        &format!("{}__{}", trait_name, assoc_type),
+        &format!("{}ඞ{}", trait_name, assoc_type),
         assoc_type.span(), // .located_at(trait_name.span()),
     )
 }

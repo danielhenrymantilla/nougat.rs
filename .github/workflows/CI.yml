@@ -9,12 +9,12 @@ on:
 jobs:
   # == CHECK == #
   check:
-    name: "Check beta stable and MSRV=1.60.0"
+    name: "Check beta stable and MSRV=1.53.0"
     runs-on: ubuntu-latest
     strategy:
       matrix:
         rust-toolchains:
-          - 1.60.0
+          - 1.53.0
           - stable
           - beta
         cargo-locked: ["--locked", ""]
@@ -52,7 +52,7 @@ jobs:
           - macos-latest
           - windows-latest
         rust-toolchains:
-          - 1.60.0
+          - 1.53.0
           - stable
     steps:
       - name: Install Rust toolchain
@@ -65,17 +65,18 @@ jobs:
       - name: Clone repo
         uses: actions/checkout@v2
 
-      - name: Cargo test
+      - name: Cargo test (MSRV)
+        if: matrix.rust-toolchains == '1.53.0'
         uses: actions-rs/cargo@v1
         with:
           command: test
 
-      - name: Cargo test (embedded doc tests)
+      - name: Cargo test (full)
         if: matrix.rust-toolchains == 'stable'
         uses: actions-rs/cargo@v1
         with:
           command: test
-          args: --features docs --doc
+          args: --features docs,test-lending-iterator-filter
 
   # == UI TESTS ==
   ui-test:

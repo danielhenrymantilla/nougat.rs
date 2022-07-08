@@ -23,15 +23,21 @@ debug-macros = [
     "nougat-proc_macros/debug-macros"
 ]
 
+test-lending-iterator-filter = [
+    "polonius-the-crab",
+]
+
 [dependencies]
-macro_rules_attribute.version = "0.1.0"
+macro_rules_attribute.version = "0.1.2"
+
+polonius-the-crab.version = "0.2.1"
+polonius-the-crab.optional = true
 
 [dependencies.nougat-proc_macros]
 path = "src/proc_macros"
 version = "0.2.0-rc1"  # Keep in sync
 
 [dev-dependencies]
-polonius-the-crab.version = "0.2.1"
 
 [workspace]
 members = [

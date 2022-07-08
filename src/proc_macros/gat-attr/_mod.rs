@@ -143,7 +143,7 @@ impl visit_mut::VisitMut
         if  type_path.path.segments.first().unwrap().ident == "Self"
         &&  matches!(
                 type_path.path.segments.last().unwrap().arguments,
-                | PathArguments::AngleBracketed { .. }
+                PathArguments::AngleBracketed { .. }
             )
         {
             let Self_;
