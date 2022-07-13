@@ -26,20 +26,28 @@ type Item<'lt, I> = Gat!(<I as LendingIterator>::Item<'lt>);
 
 struct Infinite;
 
-#[gat]
-impl LendingIterator for Infinite {
-    type Item<'next>
-    where
-        Self : 'next,
-    =
-        &'next mut Self
-    ;
+mod infinite_impl {
+    use super::Infinite;
+    use nougat::{gat, Gat};
 
-    fn next (
-        self: &'_ mut Self,
-    ) -> Option<&'_ mut Self>
-    {
-        Some(self)
+    #[gat(Item)]
+    use super::LendingIterator;
+
+    #[gat]
+    impl LendingIterator for Infinite {
+        type Item<'next>
+        where
+            Self : 'next,
+        =
+            &'next mut Self
+        ;
+
+        fn next (
+            self: &'_ mut Self,
+        ) -> Option<&'_ mut Self>
+        {
+            Some(self)
+        }
     }
 }
 
