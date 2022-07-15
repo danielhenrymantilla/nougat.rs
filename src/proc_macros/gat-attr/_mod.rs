@@ -11,8 +11,14 @@ fn gat (
 ) -> Result<TokenStream2>
 {
     match parse2(input)? {
-        | Item::Trait(item_trait) => trait_def::handle(item_trait),
-        | Item::Impl(item_impl) => trait_impl::handle(item_impl),
+        | Item::Trait(item_trait) => {
+            let _: parse::Nothing = parse2(attrs)?;
+            trait_def::handle(item_trait)
+        },
+        | Item::Impl(item_impl) => {
+            let _: parse::Nothing = parse2(attrs)?;
+            trait_impl::handle(item_impl)
+        },
         | Item::Use(item_use) => {
             let assoc_types = Punctuated::<NestedMeta, syn::token::Comma>::parse_terminated.parse2(attrs)?;
             trait_use::handle(item_use, &assoc_types)
