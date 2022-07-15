@@ -57,29 +57,43 @@ struct WindowsMut<Slice, const WIDTH: usize> {
     start: usize,
 }
 
-#[gat]
-impl<'lt, T, const WIDTH: usize>
-    LendingIterator
-for
-    WindowsMut<&'lt mut [T], WIDTH>
-{
-    type Item<'next>
-    where
-        Self : 'next,
-    =
-        &'next mut [T; WIDTH]
-    ;
+mod lending_iterator_impl {
+    use {
+        ::core::convert::TryInto,
+        ::nougat::{
+            gat,
+            Gat
+        }
+    };
+    use super::WindowsMut;
 
-    fn next (self: &'_ mut WindowsMut<&'lt mut [T], WIDTH>)
-      -> Option<&'_ mut [T; WIDTH]>
+    #[gat(Item)]
+    use super::LendingIterator as LendingIteratorRenamed;
+
+    #[gat]
+    impl<'lt, T, const WIDTH: usize>
+        LendingIteratorRenamed
+    for
+        WindowsMut<&'lt mut [T], WIDTH>
     {
-        let to_yield =
-            self.slice
-                .get_mut(self.start ..)?
-                .get_mut(.. WIDTH)?
+        type Item<'next>
+        where
+            Self : 'next,
+        =
+            &'next mut [T; WIDTH]
         ;
-        self.start += 1;
-        Some(to_yield.try_into().unwrap())
+
+        fn next (self: &'_ mut WindowsMut<&'lt mut [T], WIDTH>)
+          -> Option<&'_ mut [T; WIDTH]>
+        {
+            let to_yield =
+                self.slice
+                    .get_mut(self.start ..)?
+                    .get_mut(.. WIDTH)?
+            ;
+            self.start += 1;
+            Some(to_yield.try_into().unwrap())
+        }
     }
 }
 
