@@ -22,6 +22,23 @@ trait LendingIterator {
     ;
 }
 
+#[gat]
+trait MultiLendingIterator {
+    type Item1<'next>
+    where
+        Self : 'next,
+    ;
+    type Item2<'next>
+    where
+        Self : 'next,
+    ;
+
+    fn next (
+        self: &'_ mut Self,
+    ) -> Option<(Self::Item1<'_>, Self::Item2<'_>)>
+    ;
+}
+
 type Item<'lt, I> = Gat!(<I as LendingIterator>::Item<'lt>);
 
 struct Infinite;
@@ -35,6 +52,8 @@ mod infinite_impl {
     // UseTree::Path / UseTree::Name
     #[gat(Item)]
     use super::LendingIterator;
+    #[gat(Item1, Item2)]
+    use super::MultiLendingIterator;
 
     #[gat]
     impl LendingIterator for Infinite {
@@ -52,6 +71,30 @@ mod infinite_impl {
             Some(self)
         }
     }
+
+    #[gat]
+    impl MultiLendingIterator for Infinite {
+        type Item1<'next>
+        where
+            Self : 'next,
+        =
+            &'next Self
+        ;
+
+        type Item2<'next>
+        where
+            Self : 'next,
+        =
+            &'next Self
+        ;
+
+        fn next (
+            self: &'_ mut Self,
+        ) -> Option<(&'_ Self, &'_ Self)>
+        {
+            Some((self, self))
+        }
+    }
 }
 
 mod infinite2_impl {
@@ -61,6 +104,8 @@ mod infinite2_impl {
     // UseTree::Rename
     #[gat(Item)]
     use super::LendingIterator as LendingIteratorRenamed;
+    #[gat(Item1, Item2)]
+    use super::MultiLendingIterator as MultiLendingIteratorRenamed;
 
     #[gat]
     impl LendingIteratorRenamed for Infinite2 {
@@ -78,6 +123,30 @@ mod infinite2_impl {
             Some(self)
         }
     }
+
+    #[gat]
+    impl MultiLendingIteratorRenamed for Infinite2 {
+        type Item1<'next>
+        where
+            Self : 'next,
+        =
+            &'next Self
+        ;
+
+        type Item2<'next>
+        where
+            Self : 'next,
+        =
+            &'next Self
+        ;
+
+        fn next (
+            self: &'_ mut Self,
+        ) -> Option<(&'_ Self, &'_ Self)>
+        {
+            Some((self, self))
+        }
+    }
 }
 
 mod infinite3_impl {
@@ -87,6 +156,8 @@ mod infinite3_impl {
     // UseTree::Group
     #[gat(Item)]
     use super::{LendingIterator as LendingIteratorRenamed};
+    #[gat(Item1, Item2)]
+    use super::{MultiLendingIterator as MultiLendingIteratorRenamed};
 
     #[gat]
     impl LendingIteratorRenamed for Infinite3 {
@@ -102,6 +173,30 @@ mod infinite3_impl {
         ) -> Option<&'_ mut Self>
         {
             Some(self)
+        }
+    }
+
+    #[gat]
+    impl MultiLendingIteratorRenamed for Infinite3 {
+        type Item1<'next>
+        where
+            Self : 'next,
+        =
+            &'next Self
+        ;
+
+        type Item2<'next>
+        where
+            Self : 'next,
+        =
+            &'next Self
+        ;
+
+        fn next (
+            self: &'_ mut Self,
+        ) -> Option<(&'_ Self, &'_ Self)>
+        {
+            Some((self, self))
         }
     }
 }
