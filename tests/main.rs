@@ -25,16 +25,71 @@ trait LendingIterator {
 type Item<'lt, I> = Gat!(<I as LendingIterator>::Item<'lt>);
 
 struct Infinite;
+struct Infinite2;
+struct Infinite3;
 
 mod infinite_impl {
     use super::Infinite;
     use nougat::{gat, Gat};
 
+    // UseTree::Path / UseTree::Name
     #[gat(Item)]
     use super::LendingIterator;
 
     #[gat]
     impl LendingIterator for Infinite {
+        type Item<'next>
+        where
+            Self : 'next,
+        =
+            &'next mut Self
+        ;
+
+        fn next (
+            self: &'_ mut Self,
+        ) -> Option<&'_ mut Self>
+        {
+            Some(self)
+        }
+    }
+}
+
+mod infinite2_impl {
+    use super::Infinite2;
+    use nougat::{gat, Gat};
+
+    // UseTree::Rename
+    #[gat(Item)]
+    use super::LendingIterator as LendingIteratorRenamed;
+
+    #[gat]
+    impl LendingIteratorRenamed for Infinite2 {
+        type Item<'next>
+        where
+            Self : 'next,
+        =
+            &'next mut Self
+        ;
+
+        fn next (
+            self: &'_ mut Self,
+        ) -> Option<&'_ mut Self>
+        {
+            Some(self)
+        }
+    }
+}
+
+mod infinite3_impl {
+    use super::Infinite3;
+    use nougat::{gat, Gat};
+
+    // UseTree::Group
+    #[gat(Item)]
+    use super::{LendingIterator as LendingIteratorRenamed};
+
+    #[gat]
+    impl LendingIteratorRenamed for Infinite3 {
         type Item<'next>
         where
             Self : 'next,
@@ -57,43 +112,29 @@ struct WindowsMut<Slice, const WIDTH: usize> {
     start: usize,
 }
 
-mod lending_iterator_impl {
-    use {
-        ::core::convert::TryInto,
-        ::nougat::{
-            gat,
-            Gat
-        }
-    };
-    use super::WindowsMut;
+#[gat]
+impl<'lt, T, const WIDTH: usize>
+    LendingIterator
+for
+    WindowsMut<&'lt mut [T], WIDTH>
+{
+    type Item<'next>
+    where
+        Self : 'next,
+    =
+        &'next mut [T; WIDTH]
+    ;
 
-    #[gat(Item)]
-    use super::LendingIterator as LendingIteratorRenamed;
-
-    #[gat]
-    impl<'lt, T, const WIDTH: usize>
-        LendingIteratorRenamed
-    for
-        WindowsMut<&'lt mut [T], WIDTH>
+    fn next (self: &'_ mut WindowsMut<&'lt mut [T], WIDTH>)
+      -> Option<&'_ mut [T; WIDTH]>
     {
-        type Item<'next>
-        where
-            Self : 'next,
-        =
-            &'next mut [T; WIDTH]
+        let to_yield =
+            self.slice
+                .get_mut(self.start ..)?
+                .get_mut(.. WIDTH)?
         ;
-
-        fn next (self: &'_ mut WindowsMut<&'lt mut [T], WIDTH>)
-          -> Option<&'_ mut [T; WIDTH]>
-        {
-            let to_yield =
-                self.slice
-                    .get_mut(self.start ..)?
-                    .get_mut(.. WIDTH)?
-            ;
-            self.start += 1;
-            Some(to_yield.try_into().unwrap())
-        }
+        self.start += 1;
+        Some(to_yield.try_into().unwrap())
     }
 }
 

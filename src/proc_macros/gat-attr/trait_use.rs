@@ -70,9 +70,34 @@ fn find_use_path_and_name<'item>(
             find_use_path_and_name(accumulated_path, &use_path.tree)
         }
         UseTree::Name(use_name) => Ok((accumulated_path, NameType::Name(use_name))),
-        UseTree::Rename(use_rename) => Ok((accumulated_path, NameType::Rename(use_rename))),
-        UseTree::Glob(_) | UseTree::Group(_) => {
-            bail!("expected a single item in this import, e.g. `use path::to::Trait`")
+        UseTree::Rename(use_rename) => {
+            // Support a single renamed trait without a group, e.g.
+            //
+            // ```rust
+            // #[gat(Item)]
+            // use lib_crate::Trait as Renamed;
+            // ```
+            Ok((accumulated_path, NameType::Rename(use_rename)))
+        },
+        UseTree::Group(use_group) => {
+            // Only support a single renamed trait in a use-group, e.g.
+            //
+            // ```rust
+            // #[gat(Item)]
+            // use lib_crate::{Trait as Renamed};
+            // ```
+
+            if use_group.items.len() == 1 {
+                if let Some(UseTree::Rename(use_rename)) = use_group.items.first() {
+                    return Ok((accumulated_path, NameType::Rename(use_rename)));
+                }
+            }
+            bail!("expected a single item in this import, e.g.\n\
+                `use path::to::Trait`, or `use path::to::Trait as Renamed`")
+        }
+        UseTree::Glob(_) => {
+            bail!("expected a single item in this import, e.g.\n\
+                    `use path::to::Trait`, or `use path::to::Trait as Renamed`")
         }
     }
 }
