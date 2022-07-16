@@ -20,7 +20,7 @@ fn gat (
             trait_impl::handle(item_impl)
         },
         | Item::Use(item_use) => {
-            let assoc_types = Punctuated::<NestedMeta, syn::token::Comma>::parse_terminated.parse2(attrs)?;
+            let assoc_types = Punctuated::<Ident, Token![,]>::parse_terminated.parse2(attrs)?;
             trait_use::handle(item_use, &assoc_types)
         }
         | _ => bail!("expected a `trait` or an `impl… Trait for`"),

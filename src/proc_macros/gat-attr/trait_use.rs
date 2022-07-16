@@ -2,37 +2,21 @@ use super::*;
 
 pub(super) fn handle(
     assoc_type_use: ItemUse,
-    assoc_types: &Punctuated<NestedMeta, syn::token::Comma>,
+    assoc_types: &Punctuated<Ident, Token![,]>,
 ) -> Result<TokenStream2> {
     let (use_segments, name_type) = find_use_path_and_name(Vec::new(), &assoc_type_use.tree)?;
 
     let assoc_typenames = assoc_types
         .iter()
-        .map(|nested_meta| {
-            if let NestedMeta::Meta(Meta::Path(Path {
-                segments: assoc_type_path,
-                ..
-            })) = nested_meta
-            {
-                Ok(assoc_type_path)
-            } else {
-                bail!("expected `#[gat(Item, …)]`")
-            }
-        })
         .try_fold::<_, _, std::result::Result<_, Error>>(
             Vec::<TokenStream2>::with_capacity(assoc_types.len()),
-            |mut assoc_uses, assoc_type_path| {
-                let assoc_type_path = assoc_type_path?;
-                let assoc_type = assoc_type_path
-                    .last()
-                    .expect("Expected exactly one segment in the path");
-
+            |mut assoc_uses, assoc_type| {
                 match name_type {
                     NameType::Name(use_name) => {
                         // Push a list of `TraitඞData`
                         let trait_name = &use_name.ident;
                         let assoc_typename =
-                            combine_trait_name_and_assoc_type(trait_name, &assoc_type.ident);
+                            combine_trait_name_and_assoc_type(trait_name, assoc_type);
 
                         assoc_uses.push(quote!(#assoc_typename));
                     },
@@ -42,9 +26,9 @@ pub(super) fn handle(
                         let trait_rename = &use_rename.rename;
 
                         let assoc_typename =
-                            combine_trait_name_and_assoc_type(trait_name, &assoc_type.ident);
+                            combine_trait_name_and_assoc_type(trait_name, assoc_type);
                         let assoc_typename_rename =
-                            combine_trait_name_and_assoc_type(trait_rename, &assoc_type.ident);
+                            combine_trait_name_and_assoc_type(trait_rename, assoc_type);
 
                         assoc_uses.push(quote!(#assoc_typename as #assoc_typename_rename));
                     },
