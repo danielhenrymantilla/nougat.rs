@@ -105,7 +105,7 @@ mod infinite2_impl {
     #[gat(Item)]
     use super::LendingIterator as LendingIteratorRenamed;
     #[gat(Item1, Item2)]
-    use super::MultiLendingIterator as MultiLendingIteratorRenamed;
+    use super::{MultiLendingIterator as MultiLendingIteratorRenamed};
 
     #[gat]
     impl LendingIteratorRenamed for Infinite2 {

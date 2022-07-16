@@ -93,11 +93,11 @@ fn find_use_path_and_name<'item>(
                 }
             }
             bail!("expected a single item in this import, e.g.\n\
-                `use path::to::Trait`, or `use path::to::Trait as Renamed`")
+                `use path::to::Trait`, or `use path::to::Trait as Renamed`" => use_group)
         }
-        UseTree::Glob(_) => {
+        UseTree::Glob(glob) => {
             bail!("expected a single item in this import, e.g.\n\
-                    `use path::to::Trait`, or `use path::to::Trait as Renamed`")
+                    `use path::to::Trait`, or `use path::to::Trait as Renamed`" => glob)
         }
     }
 }
