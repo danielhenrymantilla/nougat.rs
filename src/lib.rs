@@ -85,6 +85,29 @@
          type Of<T> = Vec<T>;
      }
      ``` */
+///
+///  - ⚠️ When `use` or `pub use`ing a `#[gat]`-annotated trait, make sure
+///    to annotate such `use` "statement" with `#[gat(AssocItem)]`.
+///
+///    ⚠️ **Otherwise it won't be possible to implement that trait through the
+///    new path** ⚠️
+///
+///    For instance:
+/**    ```rust
+    extern crate nougat as nou;
+
+    mod example {
+        #[nou::gat]
+        pub trait LendingIterator {
+            type Item<'next>;
+            // …
+        }
+    }
+
+    // ⚠️ DO NOT FORGET TO ADD THIS ⚠️
+    #[nou::gat(Item)] // 👈
+    pub use example::LendingIterator;
+    ``` */
 pub use ::nougat_proc_macros::gat;
 
 /// Refer to a `<Type as Trait>::Assoc<…>` type.

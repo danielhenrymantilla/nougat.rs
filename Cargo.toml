@@ -4,7 +4,7 @@ name = "nougat"
 authors = [
     "Daniel Henry-Mantilla <daniel.henry.mantilla@gmail.com>",
 ]
-version = "0.2.1-rc1"  # Keep in sync
+version = "0.2.1-rc2"  # Keep in sync
 edition = "2018"
 
 license = "Zlib OR MIT OR Apache-2.0"
@@ -35,7 +35,7 @@ polonius-the-crab.optional = true
 
 [dependencies.nougat-proc_macros]
 path = "src/proc_macros"
-version = "0.2.1-rc1"  # Keep in sync
+version = "0.2.1-rc2"  # Keep in sync
 
 [dev-dependencies]
 
