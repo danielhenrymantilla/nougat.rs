@@ -6,7 +6,8 @@ pub(super) fn handle(
 ) -> Result<TokenStream2> {
     let (use_segments, name_type) = find_use_path_and_name(Vec::new(), &assoc_type_use.tree)?;
 
-    let assoc_typenames = assoc_types
+    let assoc_typenames =
+        assoc_types
         .iter()
         .try_fold::<_, _, std::result::Result<_, Error>>(
             Vec::<TokenStream2>::with_capacity(assoc_types.len()),
@@ -36,11 +37,15 @@ pub(super) fn handle(
 
                 Ok(assoc_uses)
             },
-        )?;
+        )?
+    ;
 
+    let pub_ = &assoc_type_use.vis;
     Ok(quote! {
         #assoc_type_use
-        use #(#use_segments :: )* { #(#assoc_typenames,)* };
+
+        #[doc(hidden)] /** Not part of the public API */
+        #pub_ use #(#use_segments :: )* { #(#assoc_typenames,)* };
     })
 }
 

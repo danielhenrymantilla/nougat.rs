@@ -12,12 +12,8 @@ trait Foo {}
 ### The `#[gat]` attribute only allows one item in imports
 
 ```rust ,compile_fail
-// for some reason we need to surround this in a module,
-// otherwise the inner module imports don't resolve correctly,
-// and the compile failure is not the right failure we test.
-mod provider {
-
 use ::nougat::*;
+
 #[gat]
 trait Foo { type Item<'item> where Self: 'item; }
 struct Bar;
@@ -28,8 +24,9 @@ mod inner {
     #[gat(Item)]
     use super::{Foo, Bar};
 }
-}
 
+fn main ()
+{}
 ```
 
 <!-- Templated by `cargo-generate` using https://github.com/danielhenrymantilla/proc-macro-template -->
