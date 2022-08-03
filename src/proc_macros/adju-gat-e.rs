@@ -26,15 +26,28 @@ impl visit_mut::VisitMut for ApplyGatToEachTypePathOccurrence {
     )
     {
         visit_mut::visit_type_mut(self, type_); // subrecurse
-        if let Type::Path(ref type_path) = *type_ {
-            match Gat::Gat(Gat::Input::TypePath(type_path.clone())) {
-                | Ok(modified_type_path) => {
-                    // Trick: using `Verbatim` over `parse2` skips a layer
-                    // of unnecessary parsing.
-                    *type_ = Type::Verbatim(modified_type_path);
-                },
-                | Err(()) => {},
-            }
+        match *type_ {
+            | Type::Path(ref type_path) => {
+                match Gat::Gat(Gat::Input::TypePath(type_path.clone())) {
+                    | Ok(modified_type_path) => {
+                        // Trick: using `Verbatim` over `parse2` skips a layer
+                        // of unnecessary parsing.
+                        *type_ = Type::Verbatim(modified_type_path);
+                    },
+                    | Err(()) => {},
+                }
+            },
+            | Type::ImplTrait(ref impl_trait) => {
+                match Gat::Gat(Gat::Input::TypeImpl(impl_trait.clone())) {
+                    | Ok(modified_type_path) => {
+                        // Trick: using `Verbatim` over `parse2` skips a layer
+                        // of unnecessary parsing.
+                        *type_ = Type::Verbatim(modified_type_path);
+                    },
+                    | Err(()) => {},
+                }
+            },
+            | _ => {},
         }
     }
 }
