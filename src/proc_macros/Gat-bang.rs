@@ -157,26 +157,20 @@ fn handle_type_impl_trait (mut impl_Trait: TypeImplTrait)
                         {
                             Ok(GatBinding {
                                 ident: input.parse()?,
-                                lifetimes:
-                                    if  input
-                                            .parse::<Option<Token![<]>>()?
-                                            .is_some()
-                                    {
-                                        let mut it = Punctuated::new();
-                                        while let Some(lifetime) = input.parse::<Option<_>>()? {
-                                            it.push_value(lifetime);
-                                            if let Some(comma) = input.parse::<Option<_>>()? {
-                                                it.push_punct(comma);
-                                            } else {
-                                                break;
-                                            }
+                                lifetimes: {
+                                    let _: Token![<] = input.parse()?;
+                                    let mut it = Punctuated::new();
+                                    while let Some(lt) = input.parse()? {
+                                        it.push_value(lt);
+                                        if let Some(p) = input.parse()? {
+                                            it.push_punct(p);
+                                        } else {
+                                            break;
                                         }
-                                        let _: Token![>] = input.parse()?;
-                                        it
-                                    } else {
-                                        <_>::default()
                                     }
-                                ,
+                                    let _: Token![>] = input.parse()?;
+                                    it
+                                },
                                 eq_token: input.parse()?,
                                 ty: input.parse()?,
                             })
@@ -201,18 +195,6 @@ fn handle_type_impl_trait (mut impl_Trait: TypeImplTrait)
                         .collect()
                 ;
                 // generate the extra super traits
-                let generics =
-                    match trait_bound
-                            .path
-                            .segments
-                            .last()
-                            .unwrap()
-                            .arguments
-                    {
-                        | PathArguments::AngleBracketed(ref it) => it,
-                        | _ => return,
-                    }
-                ;
                 for GatBinding {
                         ident: Assoc @ _,
                         lifetimes: gat_lifetimes,
@@ -221,6 +203,18 @@ fn handle_type_impl_trait (mut impl_Trait: TypeImplTrait)
                     }
                         in bindings
                 {
+                    let generics =
+                        match trait_bound
+                                .path
+                                .segments
+                                .last()
+                                .unwrap()
+                                .arguments
+                        {
+                            | PathArguments::AngleBracketed(ref it) => it,
+                            | _ => return,
+                        }
+                    ;
                     let each_generic_lt =
                         generics.args.iter().filter(|it| matches!(it,
                             GenericArgument::Lifetime { .. }
@@ -254,9 +248,7 @@ fn handle_type_impl_trait (mut impl_Trait: TypeImplTrait)
     impl_Trait.bounds.extend(
         extra_bounds.into_iter().map(TypeParamBound::Trait)
     );
-    let ret = impl_Trait.into_token_stream();
-    println!("{}", ret);
-    ret
+    impl_Trait.into_token_stream()
 }
 
 // Since `adjugate`'s visitor will call the above for any encountered type
