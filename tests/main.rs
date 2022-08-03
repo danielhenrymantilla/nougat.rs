@@ -310,3 +310,11 @@ where
         })
     }
 }
+
+#[apply(Gat!)]
+fn return_impl_ty<T> (slice: &'_ mut [T])
+  -> impl '_ + for<'n> LendingIterator<Item<'n> = &'n mut [T; 2]>
+{
+
+    WindowsMut::<_, 2> { slice, start: 0 }
+}

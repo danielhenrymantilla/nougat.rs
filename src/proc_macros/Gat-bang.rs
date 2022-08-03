@@ -1,7 +1,11 @@
 use super::*;
 
 pub(in super)
-enum Input { TypePath(TypePath), Item(Item) }
+enum Input {
+    TypePath(TypePath),
+    TypeImpl(TypeImplTrait),
+    Item(Item),
+}
 
 pub(in super)
 fn Gat<Error : SynError> (
@@ -21,6 +25,11 @@ fn Gat<Error : SynError> (
             {
                 if input.peek(Token![<]).not() {
                     let ref fork = input.fork();
+                    if let ty_impl @ Ok(_) = fork.parse().map(Input::TypeImpl) {
+                        ::syn::parse::discouraged::Speculative::advance_to(input, fork);
+                        return ty_impl;
+                    }
+                    let ref fork = input.fork();
                     if let item @ Ok(_) = fork.parse().map(Input::Item) {
                         ::syn::parse::discouraged::Speculative::advance_to(input, fork);
                         return item;
@@ -32,6 +41,9 @@ fn Gat<Error : SynError> (
 
         match input {
             | Input::TypePath(it) => it,
+            | Input::TypeImpl(it) => return Ok(utils::mb_file_expanded(
+                handle_type_impl_trait(it)
+            )),
             | Input::Item(item) => return Ok(utils::mb_file_expanded(
                 adjugate::adjugate(parse::Nothing, item)
                     .into_token_stream()
@@ -108,6 +120,143 @@ fn Gat<Error : SynError> (
     *trait_ = last_segment;
 
     Ok(TypePath { qself: Some(qself), path }.into_token_stream())
+}
+
+fn handle_type_impl_trait (mut impl_Trait: TypeImplTrait)
+  -> TokenStream2
+{
+    let mut extra_bounds = vec![];
+    impl_Trait
+        .bounds
+        .iter_mut()
+        .filter_map(|it| match it {
+            | TypeParamBound::Trait(trait_bound) => Some(trait_bound),
+            | _ => None,
+        })
+        .for_each(|trait_bound| {
+            let Trait @ _ = trait_bound.path.segments.last_mut().unwrap();
+            let generics = match Trait.arguments {
+                | PathArguments::AngleBracketed(ref mut it) => it,
+                | _ => return,
+            };
+            let mut to_drain = vec![];
+            let mut bindings = vec![];
+            struct GatBinding {
+                ident: Ident,
+                lifetimes: Punctuated<Lifetime, Token![,]>,
+                eq_token: Token![=],
+                ty: Type,
+            }
+            generics.args.iter().enumerate().for_each(|(i, arg)| match arg {
+                // syn 1.* cannot handle GAT `Binding`s
+                // so it currently falls back to a verbatim.
+                | GenericArgument::Type(Type::Verbatim(tokens)) => {
+                    impl Parse for GatBinding {
+                        fn parse (input: ParseStream<'_>)
+                          -> Result<GatBinding>
+                        {
+                            Ok(GatBinding {
+                                ident: input.parse()?,
+                                lifetimes:
+                                    if  input
+                                            .parse::<Option<Token![<]>>()?
+                                            .is_some()
+                                    {
+                                        let mut it = Punctuated::new();
+                                        while let Some(lifetime) = input.parse::<Option<_>>()? {
+                                            it.push_value(lifetime);
+                                            if let Some(comma) = input.parse::<Option<_>>()? {
+                                                it.push_punct(comma);
+                                            } else {
+                                                break;
+                                            }
+                                        }
+                                        let _: Token![>] = input.parse()?;
+                                        it
+                                    } else {
+                                        <_>::default()
+                                    }
+                                ,
+                                eq_token: input.parse()?,
+                                ty: input.parse()?,
+                            })
+                        }
+                    }
+                    if let Ok(binding) = parse2::<GatBinding>(tokens.clone()) {
+                        to_drain.push(i);
+                        bindings.push(binding);
+                    }
+                },
+                | _ => {},
+            });
+            if to_drain.is_empty().not() {
+                // Remove the GAT bindings.
+                generics.args =
+                    mem::take(&mut generics.args)
+                        .into_iter()
+                        .enumerate()
+                        .filter_map(|(i, arg)| {
+                            to_drain.contains(&i).not().then(|| arg)
+                        })
+                        .collect()
+                ;
+                // generate the extra super traits
+                let generics =
+                    match trait_bound
+                            .path
+                            .segments
+                            .last()
+                            .unwrap()
+                            .arguments
+                    {
+                        | PathArguments::AngleBracketed(ref it) => it,
+                        | _ => return,
+                    }
+                ;
+                for GatBinding {
+                        ident: Assoc @ _,
+                        lifetimes: gat_lifetimes,
+                        eq_token: eq_,
+                        ty,
+                    }
+                        in bindings
+                {
+                    let each_generic_lt =
+                        generics.args.iter().filter(|it| matches!(it,
+                            GenericArgument::Lifetime { .. }
+                        ))
+                    ;
+                    let each_generic_ty_or_const =
+                        generics.args.iter().filter(|it| matches!(it,
+                            GenericArgument::Type { .. } |
+                            GenericArgument::Const { .. }
+                        ))
+                    ;
+                    let mut trait_bound = trait_bound.clone();
+                    let last_segment = trait_bound.path.segments.last_mut().unwrap();
+                    let Trait_Assoc = combine_trait_name_and_assoc_type(
+                        &last_segment.ident,
+                        &Assoc,
+                    );
+                    *last_segment = parse_quote!(
+                        #Trait_Assoc<
+                            #(#each_generic_lt ,)*
+                            #gat_lifetimes,
+                            #(#each_generic_ty_or_const ,)*
+                            T #eq_ #ty,
+                        >
+                    );
+                    extra_bounds.push(trait_bound);
+                }
+            }
+        })
+    ;
+    impl_Trait.bounds.extend(
+        extra_bounds.into_iter().map(TypeParamBound::Trait)
+    );
+    let ret = impl_Trait.into_token_stream();
+    println!("{}", ret);
+    ret
 }
 
 // Since `adjugate`'s visitor will call the above for any encountered type
