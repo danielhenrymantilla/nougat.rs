@@ -337,3 +337,15 @@ fn for_<T> ()
     takes_impl_ty(returns_impl_ty(&mut [(); 0]));
     takes_impl_ty2(returns_impl_ty(&mut [(); 0]));
 }
+
+#[apply(Gat!)]
+trait Foo<T>
+:
+    for<'n> LendingIterator<Item<'n> = &'n mut [T; 2]>
+{}
+
+#[apply(Gat!)]
+impl<X, T> Foo<T> for X
+where
+    Self : for<'n> LendingIterator<Item<'n> = &'n mut [T; 2]>,
+{}
