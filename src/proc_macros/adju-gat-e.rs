@@ -50,4 +50,31 @@ impl visit_mut::VisitMut for ApplyGatToEachTypePathOccurrence {
             | _ => {},
         }
     }
+
+    fn visit_type_param_mut (
+        self: &'_ mut ApplyGatToEachTypePathOccurrence,
+        type_param: &'_ mut TypeParam,
+    )
+    {
+        visit_mut::visit_type_param_mut(self, type_param); // subrecurse
+        crate::Gat::handle_trait_bounds(&mut type_param.bounds);
+    }
+
+    fn visit_predicate_type_mut (
+        self: &'_ mut ApplyGatToEachTypePathOccurrence,
+        predicate_type: &'_ mut PredicateType,
+    )
+    {
+        visit_mut::visit_predicate_type_mut(self, predicate_type); // subrecurse
+        crate::Gat::handle_trait_bounds(&mut predicate_type.bounds);
+    }
+
+    fn visit_item_trait_mut (
+        self: &'_ mut ApplyGatToEachTypePathOccurrence,
+        item_trait: &'_ mut ItemTrait,
+    )
+    {
+        visit_mut::visit_item_trait_mut(self, item_trait); // subrecurse
+        crate::Gat::handle_trait_bounds(&mut item_trait.supertraits);
+    }
 }

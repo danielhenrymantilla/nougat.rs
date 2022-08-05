@@ -312,9 +312,40 @@ where
 }
 
 #[apply(Gat!)]
-fn return_impl_ty<T> (slice: &'_ mut [T])
+fn returns_impl_ty<T> (slice: &'_ mut [T])
   -> impl '_ + for<'n> LendingIterator<Item<'n> = &'n mut [T; 2]>
 {
-
     WindowsMut::<_, 2> { slice, start: 0 }
 }
+
+#[apply(Gat!)]
+fn takes_impl_ty<T> (
+    _: impl for<'n> LendingIterator<Item<'n> = &'n mut [T; 2]>,
+)
+{}
+
+#[apply(Gat!)]
+fn takes_impl_ty2<T, I> (
+    _: I,
+)
+where
+    I : for<'n> LendingIterator<Item<'n> = &'n mut [T; 2]>,
+{}
+
+fn for_<T> ()
+{
+    takes_impl_ty(returns_impl_ty(&mut [(); 0]));
+    takes_impl_ty2(returns_impl_ty(&mut [(); 0]));
+}
+
+#[apply(Gat!)]
+trait Foo<T>
+:
+    for<'n> LendingIterator<Item<'n> = &'n mut [T; 2]>
+{}
+
+#[apply(Gat!)]
+impl<X, T> Foo<T> for X
+where
+    Self : for<'n> LendingIterator<Item<'n> = &'n mut [T; 2]>,
+{}

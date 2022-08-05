@@ -111,6 +111,7 @@
 pub use ::nougat_proc_macros::gat;
 
 /// Refer to a `<Type as Trait>::Assoc<…>` type.
+/// Or express `Trait<Assoc<…> = …>` constraints.
 ///
 /// Indeed, the GATs defined by <code>[#\[gat\]]</code>, when outside of a
 /// <code>[#\[gat\]]</code>-annotated item (or a
