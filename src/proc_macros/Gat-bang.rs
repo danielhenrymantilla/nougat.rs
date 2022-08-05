@@ -41,9 +41,10 @@ fn Gat<Error : SynError> (
 
         match input {
             | Input::TypePath(it) => it,
-            | Input::TypeImpl(it) => return Ok(utils::mb_file_expanded(
-                handle_type_impl_trait(it)
-            )),
+            | Input::TypeImpl(mut it) => {
+                handle_trait_bounds(&mut it.bounds);
+                return Ok(utils::mb_file_expanded(it.into_token_stream()));
+            },
             | Input::Item(item) => return Ok(utils::mb_file_expanded(
                 adjugate::adjugate(parse::Nothing, item)
                     .into_token_stream()
@@ -122,12 +123,15 @@ fn Gat<Error : SynError> (
     Ok(TypePath { qself: Some(qself), path }.into_token_stream())
 }
 
-fn handle_type_impl_trait (mut impl_Trait: TypeImplTrait)
-  -> TokenStream2
+type TraitBounds = Punctuated<TypeParamBound, Token![+]>;
+
+pub(in crate)
+fn handle_trait_bounds (
+    trait_bounds: &mut TraitBounds,
+)
 {
     let mut extra_bounds = vec![];
-    impl_Trait
-        .bounds
+    trait_bounds
         .iter_mut()
         .filter_map(|it| match it {
             | TypeParamBound::Trait(trait_bound) => Some(trait_bound),
@@ -245,10 +249,9 @@ fn handle_type_impl_trait (mut impl_Trait: TypeImplTrait)
             }
         })
     ;
-    impl_Trait.bounds.extend(
+    trait_bounds.extend(
         extra_bounds.into_iter().map(TypeParamBound::Trait)
     );
-    impl_Trait.into_token_stream()
 }
 
 // Since `adjugate`'s visitor will call the above for any encountered type
