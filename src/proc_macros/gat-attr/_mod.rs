@@ -141,6 +141,14 @@ struct ReplaceSelfAssocLtWithSelfAsTraitAssocLt /* = */ (
 impl visit_mut::VisitMut
     for ReplaceSelfAssocLtWithSelfAsTraitAssocLt
 {
+    fn visit_item_mut (
+        self: &'_ mut Self,
+        _: &'_ mut Item,
+    )
+    {
+        /* do not subrecurse */
+    }
+
     fn visit_type_path_mut (
         self: &'_ mut Self,
         type_path: &'_ mut TypePath,
@@ -174,9 +182,9 @@ impl visit_mut::VisitMut
             type_path.qself = Some(QSelf {
                 lt_token: <_>::default(),
                 ty: parse_quote!( #Self_ ),
-                // This makes `Trait::assoc<'_>` become `Trait>::assoc<'_>`
-                position: 1,
                 as_token: parse_quote!( as ),
+                // This makes `Trait::assoc<'_>` become `Trait>::assoc<'_>`
+                position: self.0.segments.len(),
                 gt_token: <_>::default(),
             });
         }

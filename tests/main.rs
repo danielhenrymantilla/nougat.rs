@@ -9,6 +9,24 @@ use {
     },
 };
 
+mod foo {
+    struct Foo;
+
+    #[super::gat]
+    impl super::LendingIterator for Foo {
+        type Item<'n>
+        where
+            Self : 'n,
+        =
+            ()
+        ;
+
+        fn next(&mut self) -> Option<Self::Item<'_>> {
+            None
+        }
+    }
+}
+
 #[gat]
 trait LendingIterator {
     type Item<'next>
