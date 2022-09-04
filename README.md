@@ -279,7 +279,7 @@ ___
     <code>[#\[gat\]]</code>-annotated items using [`Gat!`] is needed.
 
   - Adding trait bounds to GATs in functions breaks type inference for that
-    function (thanks to Discord use `Globi` for identifying and reporting this)
+    function (thanks to Discord user `Globi` for identifying and reporting this)
 
 
 [`Gat!`]: https://docs.rs/nougat/0.1.*/nougat/macro.Gat.html
