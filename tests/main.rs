@@ -238,8 +238,8 @@ for
         &'next mut [T; WIDTH]
     ;
 
-    fn next<'a> (self: &'a mut WindowsMut<&'lt mut [T], WIDTH>)
-      -> Option<&'a mut [T; WIDTH]>
+    fn next<'next> (self: &'next mut WindowsMut<&'lt mut [T], WIDTH>)
+      -> Option<&'next mut [T; WIDTH]>
     {
         let to_yield =
             self.slice
